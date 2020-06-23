@@ -133,8 +133,8 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Extract emails from file')
     parser.add_argument("--dir", type=str, help="Directory/Folder Name", default=".")
-    parser.add_argument("--file", type=str, help="File")
+    parser.add_argument("--file", type=str, help="File to parse")
     parser.add_argument("--ext", type=str, nargs='*', help="File extensions")
-    parser.add_argument("--dst", type=str, help="Destination file name")
+    parser.add_argument("--dst", type=str, help="Output file name")
     args = parser.parse_args()
     main(args)
