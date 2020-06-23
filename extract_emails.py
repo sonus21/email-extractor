@@ -9,6 +9,8 @@ import argparse
 from striprtf import striprtf
 from pdfminer.high_level import extract_text
 
+regex = re.compile(r"([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)")
+
 
 def get_file_ext(file_name):
     tokens = file_name.split(".")
@@ -62,7 +64,7 @@ def get_text(file_name):
         except Exception:
             traceback.print_exc()
         return '\n'.join(full_text)
-    elif ext in ["doc", "docx"]:
+    elif ext in ["doc"]:
         if os.name == 'nt':
             import win32com.client
             word = win32com.client.Dispatch("Word.Application")
@@ -71,7 +73,7 @@ def get_text(file_name):
             doc = word.ActiveDocument
             return doc.Range().Text
         os.system("/Applications/LibreOffice.app/Contents/MacOS/soffice  --headless --convert-to txt:Text " + file_name)
-        fileX = os.path.split(file_name)[1].split(".") +".txt"
+        fileX = os.path.split(file_name)[1].split(".") + ".txt"
         try:
             with codecs.open(fileX, "r", "utf-8") as f:
                 return f.read()
@@ -97,8 +99,7 @@ def list_files(path):
 
 def get_emails(fileName):
     txt = get_text(fileName)
-    regex = re.compile(r"([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)")
-    return regex.findall(txt)
+    return set(regex.findall(txt))
 
 
 def get_files(dir, extensions):
