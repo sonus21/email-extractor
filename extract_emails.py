@@ -6,7 +6,8 @@ import traceback
 from docx import Document
 import PyPDF2
 import argparse
-from .striprtf import striprtf
+from striprtf import striprtf
+from pdfminer.high_level import extract_text
 
 
 def get_file_ext(file_name):
@@ -18,6 +19,11 @@ def get_file_ext(file_name):
 
 
 def get_text(file_name):
+    file_name = os.path.abspath(file_name)
+    _, actual_file_name = os.path.split(file_name)
+    if actual_file_name.startswith("~"):
+        return ""
+    print(file_name)
     ext = get_file_ext(file_name)
     if ext is None or ext in ["txt", "rst", "text", "adoc"]:
         try:
@@ -34,7 +40,8 @@ def get_text(file_name):
             print("File could not be read ", file_name)
             traceback.print_exc()
     elif ext in ["pdf"]:
-        full_text = []
+        text = extract_text('report.pdf')
+        full_text = [text]
         with open(file_name, 'rb') as f:
             reader = PyPDF2.PdfFileReader(f)
             for pageNumber in range(reader.numPages):
@@ -47,21 +54,22 @@ def get_text(file_name):
                     traceback.print_exc()
         return "\n".join(full_text)
     elif ext in ["docx"]:
-        doc = Document(file_name)
         full_text = []
-        for para in doc.paragraphs:
-            full_text.append(para.text)
+        try:
+            doc = Document(file_name)
+            for para in doc.paragraphs:
+                full_text.append(para.text)
+        except Exception:
+            traceback.print_exc()
         return '\n'.join(full_text)
-    elif ext in ["doc"]:
+    elif ext in ["doc", "docx"]:
         if os.name == 'nt':
             import win32com.client
             word = win32com.client.Dispatch("Word.Application")
             word.visible = False
-            wb = word.Documents.Open(file_name)
-            doc = wb.ActiveDocument
+            _ = word.Documents.Open(file_name)
+            doc = word.ActiveDocument
             return doc.Range().Text
-
-
         os.system("/Applications/LibreOffice.app/Contents/MacOS/soffice  --headless --convert-to txt:Text " + file_name)
         fileX = os.path.split(file_name)[1].split(".") +".txt"
         try:

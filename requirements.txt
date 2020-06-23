@@ -1,3 +1,4 @@
 PyPDF2
 python-docx
 pypiwin32
+pdfminer.six
