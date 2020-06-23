@@ -42,7 +42,7 @@ def get_text(file_name):
             print("File could not be read ", file_name)
             traceback.print_exc()
     elif ext in ["pdf"]:
-        text = extract_text('report.pdf')
+        text = extract_text(file_name)
         full_text = [text]
         with open(file_name, 'rb') as f:
             reader = PyPDF2.PdfFileReader(f)
