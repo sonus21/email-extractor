@@ -1,4 +1,5 @@
-PyPDF2
-python-docx
-pypiwin32
-pdfminer.six
+PyPDF2==1.28.6
+python-docx==0.8.11
+pypiwin32==223
+pdfminer.six==20201018
+six==1.16.0
